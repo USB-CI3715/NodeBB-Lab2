@@ -119,7 +119,8 @@ define('forum/register', [
 
 		const username_notify = $('#username-notify');
 		username_notify.text('');
-		const usernameInput = $('#username');
+		const 
+		usernameInput = $('#username');
 		const userslug = slugify(username);
 		if (username.length < ajaxify.data.minimumUsernameLength || userslug.length < ajaxify.data.minimumUsernameLength) {
 			showError(usernameInput, username_notify, '[[error:username-too-short]]');
@@ -135,7 +136,8 @@ define('forum/register', [
 				if (results.every(obj => obj.status === 'rejected')) {
 					showSuccess(usernameInput, username_notify, successIcon);
 				} else {
-					showError(usernameInput, username_notify, '[[error:username-taken]]');
+					const randomN = `${Math.floor(Math.random() * 10000)}`.padStart(4, "0")
+					showError(usernameInput, username_notify, '[[error:username-taken]]' + username + randomN);
 				}
 
 				callback();
