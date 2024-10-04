@@ -121,6 +121,7 @@ define('forum/register', [
 		username_notify.text('');
 		const usernameInput = $('#username');
 		const userslug = slugify(username);
+		const randomNum = (Math.floor(Math.random() * 10000)) % 1000;
 		if (username.length < ajaxify.data.minimumUsernameLength || userslug.length < ajaxify.data.minimumUsernameLength) {
 			showError(usernameInput, username_notify, '[[error:username-too-short]]');
 		} else if (username.length > ajaxify.data.maximumUsernameLength) {
@@ -134,8 +135,24 @@ define('forum/register', [
 			]).then((results) => {
 				if (results.every(obj => obj.status === 'rejected')) {
 					showSuccess(usernameInput, username_notify, successIcon);
+
 				} else {
-					showError(usernameInput, username_notify, '[[error:username-taken]]');
+					const suggestName = username + randomNum;
+					const suggestNameSlug = slugify(suggestName);
+
+					// SE VERIFICA SI EL NOMBRE SUGERIDO ESTA EN LA BASE DE DATOS
+
+					Promise.allSettled([
+						api.head(`/users/bySlug/${suggestNameSlug}`, {}),
+						api.head(`/groups/${suggestName}`, {}),
+
+					]).then((results) => {
+						if(results.every(obj => obj.status === 'rejected')){
+							showError(usernameInput, username_notify, '[[error:username-taken]]' + suggestName);
+						}else{
+							showError(". Pruebe con: " + suggestName);
+						}
+					})
 				}
 
 				callback();
