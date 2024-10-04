@@ -34,6 +34,8 @@ define('forum/register', [
 			}
 		});
 
+
+
 		password.on('blur', function () {
 			if (password.val().length) {
 				validatePassword(password.val(), password_confirm.val());
@@ -135,7 +137,7 @@ define('forum/register', [
 				if (results.every(obj => obj.status === 'rejected')) {
 					showSuccess(usernameInput, username_notify, successIcon);
 				} else {
-					showError(usernameInput, username_notify, '[[error:username-taken]]');
+					showError(usernameInput, username_notify, '[[error:username-taken]] Maybe try ' +  usernameInput.val() + '123.');
 				}
 
 				callback();
