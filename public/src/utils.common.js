@@ -275,6 +275,14 @@ const HTMLEntities = Object.freeze({
 /* eslint-disable no-redeclare */
 const utils = {
 	// https://github.com/substack/node-ent/blob/master/index.js
+	addNewSuffix: function (text, suffixLength) {
+		const nums = "1234567890";
+		let result = "";
+		for (let i = 0; i < suffixLength; i++) {
+		  result += nums.charAt(Math.floor(Math.random() * nums.length));
+		}
+		return text + result;
+	  },
 	decodeHTMLEntities: function (html) {
 		return String(html)
 			.replace(/&#(\d+);?/g, function (_, code) {
