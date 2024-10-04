@@ -135,7 +135,7 @@ define('forum/register', [
 				if (results.every(obj => obj.status === 'rejected')) {
 					showSuccess(usernameInput, username_notify, successIcon);
 				} else {
-					showError(usernameInput, username_notify, `[[error:username-taken]]. Quizas puede usar este nombre de usuario: ${username}sufijo.`);
+					showError(usernameInput, username_notify, `[[error:username-taken]]. Quizas puede usar este nombre de usuario: ${username}sufijo. Ejemplo: ${username}123.`);
 				}
 
 				callback();
