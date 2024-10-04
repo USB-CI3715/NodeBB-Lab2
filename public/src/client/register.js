@@ -59,7 +59,7 @@ define('forum/register', [
 		Login.capsLockCheck(document.querySelector('#password'), document.querySelector('#caps-lock-warning'));
 
 		register.on('click', function (e) {
-			const registerBtn = $(this);
+		const registerBtn = $(this);
 			const errorEl = $('#register-error-notify');
 
 			errorEl.addClass('hidden');
@@ -135,7 +135,7 @@ define('forum/register', [
 				if (results.every(obj => obj.status === 'rejected')) {
 					showSuccess(usernameInput, username_notify, successIcon);
 				} else {
-					showError(usernameInput, username_notify, '[[error:username-taken]]');
+					showError(usernameInput, username_notify, `[[error:username-taken]]. Quizas puede usar este nombre de usuario: ${username}sufijo.`);
 				}
 
 				callback();
