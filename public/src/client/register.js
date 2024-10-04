@@ -131,16 +131,39 @@ define('forum/register', [
 			Promise.allSettled([
 				api.head(`/users/bySlug/${userslug}`, {}),
 				api.head(`/groups/${username}`, {}),
-			]).then((results) => {
+			]).then(async (results) => {
 				if (results.every(obj => obj.status === 'rejected')) {
 					showSuccess(usernameInput, username_notify, successIcon);
 				} else {
-					showError(usernameInput, username_notify, '[[error:username-taken]]');
+					const suggestion = await findUsernameSuggestion(username);
+					showError(usernameInput, username_notify, '[[error:username-taken]]. Maybe try ' + suggestion);
 				}
 
 				callback();
 			});
 		}
+	}
+
+	async function findUsernameSuggestion(username){
+			let suggestion;
+			let number = 123;
+			while(true) {
+				suggestion = username + number
+				const suggestionslug = slugify(suggestion);
+				const result = await Promise.allSettled([
+					api.head(`/users/bySlug/${suggestionslug}`, {}),
+					api.head(`/groups/${suggestion}`, {}),
+				])
+
+				if (result.every(obj => obj.status === 'rejected')) {
+					break;
+				} else {
+					const endNumber = (number % 10) + 1;
+					number = (number * 10) + endNumber;
+				}
+			}
+
+			return suggestion;
 	}
 
 	function validatePassword(password, password_confirm) {
