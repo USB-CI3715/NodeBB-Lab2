@@ -135,13 +135,42 @@ define('forum/register', [
 				if (results.every(obj => obj.status === 'rejected')) {
 					showSuccess(usernameInput, username_notify, successIcon);
 				} else {
-					showError(usernameInput, username_notify, '[[error:username-taken]]');
+					suggestedusernameInput = suggestUserName(usernameInput);
+
+					showError(usernameInput, username_notify, '[[error:username-taken, ${suggestedusernameInput}]]');
 				}
 
 				callback();
 			});
 		}
 	}
+
+	function suggestUserName(username){
+		accepted = 0;
+		suggestedUser = username;
+		i = 0;
+
+		while(accepted != 1){
+
+			Promise.allSettled([
+				api.head(`/users/bySlug/${userslug}`, {}),
+				api.head(`/groups/${username}`, {}),
+			]).then((results) => {
+				if (results.every(obj => obj.status === 'rejected')) {
+					accepted = 1;
+				} else {
+
+					i += 1;
+					currentNum = i.ToString();
+					suggestUser =  username.concat(currentNum);
+				}
+			});
+		}
+		return suggestUser;
+
+	}
+
+
 
 	function validatePassword(password, password_confirm) {
 		const passwordInput = $('#password');
