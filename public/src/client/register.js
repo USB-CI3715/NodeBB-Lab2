@@ -114,6 +114,27 @@ define('forum/register', [
 		$('#username').trigger('focus');
 	};
 
+	function checkUsernameNotTaken(username, callback, username_notify, usernameInput, userslug){
+		Promise.allSettled([
+			api.head(`/users/bySlug/${userslug}`, {}),
+			api.head(`/groups/${username}`, {}),
+		]).then((results) => {
+			if (results.every(obj => obj.status === 'rejected')) {
+				showSuccess(usernameInput, username_notify, successIcon);
+			} else {
+				
+				let usernameSuffix = 0;
+				let exampleUsernameInput = username.concat(usernameSuffix.toString(),'_ci3715');
+
+				//showError(usernameInput, username_notify, '[[error:username-taken]]');
+
+				showError(usernameInput, username_notify, `${username}?, really?!, why not ${exampleUsernameInput} instead?`);
+			}
+
+			callback();
+		});
+	}
+
 	function validateUsername(username, callback) {
 		callback = callback || function () {};
 
@@ -128,6 +149,8 @@ define('forum/register', [
 		} else if (!utils.isUserNameValid(username) || !userslug) {
 			showError(usernameInput, username_notify, '[[error:invalid-username]]');
 		} else {
+			checkUsernameNotTaken(username, callback, username_notify, usernameInput, userslug);
+			/*
 			Promise.allSettled([
 				api.head(`/users/bySlug/${userslug}`, {}),
 				api.head(`/groups/${username}`, {}),
@@ -138,13 +161,15 @@ define('forum/register', [
 					
 					let usernameSuffix = 0;
 					let exampleUsernameInput = username.concat(usernameSuffix.toString(),'_ci3715');
+
 					//showError(usernameInput, username_notify, '[[error:username-taken]]');
-					//showError(usernameInput, username_notify, 'Bro wassup?');
+
 					showError(usernameInput, username_notify, `${username}?, really?!, why not ${exampleUsernameInput} instead?`);
 				}
 
 				callback();
 			});
+			*/
 		}
 	}
 
