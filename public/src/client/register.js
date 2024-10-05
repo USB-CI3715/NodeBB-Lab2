@@ -136,7 +136,8 @@ define('forum/register', [
 					showSuccess(usernameInput, username_notify, successIcon);
 				} else {
 					
-					let exampleUsernameInput = username.concat('0','_ci3715');
+					let usernameSuffix = 0;
+					let exampleUsernameInput = username.concat(usernameSuffix.toString(),'_ci3715');
 					//showError(usernameInput, username_notify, '[[error:username-taken]]');
 					//showError(usernameInput, username_notify, 'Bro wassup?');
 					showError(usernameInput, username_notify, `${username}?, really?!, why not ${exampleUsernameInput} instead?`);
