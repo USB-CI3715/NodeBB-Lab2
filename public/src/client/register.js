@@ -114,6 +114,13 @@ define('forum/register', [
 		$('#username').trigger('focus');
 	};
 
+	// Función para generar sugerencias de nombres de usuario alternativos
+	function suggestUsernameAlternatives(username) {
+		const suffixes = ['suffix'];
+		return suffixes.map(suffix => username + suffix);
+	}
+
+
 	function validateUsername(username, callback) {
 		callback = callback || function () {};
 
@@ -132,16 +139,29 @@ define('forum/register', [
 				api.head(`/users/bySlug/${userslug}`, {}),
 				api.head(`/groups/${username}`, {}),
 			]).then((results) => {
-				if (results.every(obj => obj.status === 'rejected')) {
-					showSuccess(usernameInput, username_notify, successIcon);
-				} else {
-					showError(usernameInput, username_notify, '[[error:username-taken]]');
-				}
+				const userSlugCheck = results[0];  // Verificación del usuario por slug
+				const groupCheck = results[1];     // Verificación del grupo por nombre
 
+				if (userSlugCheck.status === 'fulfilled') {
+					// El slug ya está en uso por otro usuario
+					const suggestions = suggestUsernameAlternatives(username);
+					const suggestionText = `[[error:username-taken]]. Maybe try ${suggestions.join(', ')}`;
+					showError(usernameInput, username_notify, suggestionText);
+
+					// showError(usernameInput, username_notify, '[[error:username-taken-by-user]]');
+
+				} else if (groupCheck.status === 'fulfilled') {
+					// El nombre ya está en uso por un grupo
+					showError(usernameInput, username_notify, '[[error:username-taken-by-group]]');
+				} else {
+					// Si ninguna de las verificaciones fue exitosa, significa que el nombre está disponible
+					showSuccess(usernameInput, username_notify, successIcon);
+				}
 				callback();
 			});
 		}
 	}
+
 
 	function validatePassword(password, password_confirm) {
 		const passwordInput = $('#password');
