@@ -114,24 +114,18 @@ define('forum/register', [
 		$('#username').trigger('focus');
 	};
 
-	function checkUsernameNotTaken(username, callback, username_notify, usernameInput, userslug){
+	function checkUsernameNotTaken(username, callback){
+		
+		const username_notify = $('#username-notify');
+		username_notify.text('');
+		const usernameInput = $('#username');
+		const userslug = slugify(username);
+		
 		Promise.allSettled([
 			api.head(`/users/bySlug/${userslug}`, {}),
 			api.head(`/groups/${username}`, {}),
 		]).then((results) => {
-			if (results.every(obj => obj.status === 'rejected')) {
-				showSuccess(usernameInput, username_notify, successIcon);
-			} else {
-				
-				let usernameSuffix = 0;
-				let exampleUsernameInput = username.concat(usernameSuffix.toString(),'_ci3715');
-
-				//showError(usernameInput, username_notify, '[[error:username-taken]]');
-
-				showError(usernameInput, username_notify, `${username}?, really?!, why not ${exampleUsernameInput} instead?`);
-			}
-
-			callback();
+			return (results.every(obj => obj.status === 'rejected')) 
 		});
 	}
 
@@ -149,27 +143,33 @@ define('forum/register', [
 		} else if (!utils.isUserNameValid(username) || !userslug) {
 			showError(usernameInput, username_notify, '[[error:invalid-username]]');
 		} else {
-			checkUsernameNotTaken(username, callback, username_notify, usernameInput, userslug);
-			/*
-			Promise.allSettled([
-				api.head(`/users/bySlug/${userslug}`, {}),
-				api.head(`/groups/${username}`, {}),
-			]).then((results) => {
-				if (results.every(obj => obj.status === 'rejected')) {
+
+				if (checkUsernameNotTaken(username, callback)) {
 					showSuccess(usernameInput, username_notify, successIcon);
 				} else {
 					
 					let usernameSuffix = 0;
-					let exampleUsernameInput = username.concat(usernameSuffix.toString(),'_ci3715');
+					let exampleUsername = username.concat(usernameSuffix.toString(),'_ci3715');
+
+					//placeholder para el codigo que revisaria que el nuevo username generado
+					// no este ya tomado tambien, y pueda calcularse otro si ese es el caso
+					//(ahorita esto genera un loop infinito, y yo no c hacer llamadas al backend por ahora)
+					/*
+					while(!checkUsernameNotTaken(exampleUsername, callback)){
+						exampleUsername = username.concat(usernameSuffix.toString(),'_ci3715');
+						usernameSuffix ++;
+					}
+						*/
 
 					//showError(usernameInput, username_notify, '[[error:username-taken]]');
-
-					showError(usernameInput, username_notify, `${username}?, really?!, why not ${exampleUsernameInput} instead?`);
+					// aqui hay que agregar un link con los error.json en los idiomas correspondientes que use lo que se calculo
+					//para los mensajes de error
+					showError(usernameInput, username_notify, `${username}?, really?!, why not ${exampleUsername} instead?`);
 				}
 
 				callback();
-			});
-			*/
+			
+
 		}
 	}
 
